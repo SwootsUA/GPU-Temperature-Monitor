@@ -28,7 +28,7 @@ To run the application, execute the following command in your terminal or comman
 3. The temperature label will be updated every second.
 4. The label color will change according to the temperature gradient, indicating different temperature ranges.
 
-## Compiling to EXE (Optional)
+## Compiling to EXE
 
 If you want to compile the Python script into an executable (EXE) file, you can use tools like `pyinstaller` or `cx_Freeze`. Below are the steps to compile the script using `pyinstaller`:
 
