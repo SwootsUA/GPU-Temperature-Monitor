@@ -17,11 +17,12 @@ class TransparentClock(QWidget):
         super().__init__()
         self.gpu_handle = None
         self.blink_flag = False
+        self.temp_unit = 'C'  # Default temperature unit is Celsius
         self.initUI()
 
     def initUI(self):
         self.setWindowTitle('GPU Temperature')
-        self.setGeometry(0, 0, 200, 50)
+        self.setGeometry(0, 0, 300, 50)
 
         # Set window flags to enable transparency and disable window frame
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
@@ -56,6 +57,14 @@ class TransparentClock(QWidget):
     def update_temperature(self):
         if self.gpu_handle:
             temperature = self.get_gpu_temperature()
+            
+            if self.temp_unit == 'F':
+                displayed_temperature = round(temperature * 9 / 5 + 32)
+            elif self.temp_unit == 'K':
+                displayed_temperature = temperature + 273
+            else:
+                displayed_temperature = temperature
+
 
             if self.blink_flag:
                 degree_symbol = "°"  
@@ -80,7 +89,7 @@ class TransparentClock(QWidget):
 
             color_string = f'rgb({color[0]}, {color[1]}, {color[2]})'
             self.temperature_label.setStyleSheet(f'QLabel {{ color: {color_string}; font-size: 24px; font: 24pt "Courier New", monospace, bold;}}')
-            self.temperature_label.setText(f"GPU: {temperature}{degree_symbol}C")
+            self.temperature_label.setText(f"GPU: {displayed_temperature}{degree_symbol}{self.temp_unit}")
             self.blink_flag = not self.blink_flag  # Toggle blinking
 
     def get_gpu_temperature(self):
@@ -110,11 +119,20 @@ class TransparentClock(QWidget):
 def tray_icon_clicked(reason):
     if reason == QSystemTrayIcon.DoubleClick:
         global displayed_flag
-        if not displayed_flag: 
+        if not displayed_flag:
             clock.show()
         else:
             clock.hide()
-        displayed_flag = not displayed_flag 
+        displayed_flag = not displayed_flag
+
+def change_temp_unit_to_celsius():
+    clock.temp_unit = 'C'
+
+def change_temp_unit_to_fahrenheit():
+    clock.temp_unit = 'F'
+
+def change_temp_unit_to_kelvin():
+    clock.temp_unit = 'K'
 
 if __name__ == '__main__':
     displayed_flag = True
@@ -132,12 +150,30 @@ if __name__ == '__main__':
 
     icon = QIcon(pixmap)
 
-    # Create the system tray icon and add an exit action
+    # Create the system tray icon
     tray_icon = QSystemTrayIcon(icon)
     tray_icon.setToolTip('GPU Temperature Monitor')
     exit_action = QAction('Exit', qApp)
     exit_action.triggered.connect(app.quit)
     tray_menu = QMenu()
+
+    # Add options to change temperature units in the tray menu
+    temp_unit_menu = tray_menu.addMenu('Temperature Unit')
+    celsius_action = QAction('Celsius', qApp)
+    fahrenheit_action = QAction('Fahrenheit', qApp)
+    kelvin_action = QAction('Kelvin', qApp)
+
+    # Connect actions to their respective functions
+    celsius_action.triggered.connect(change_temp_unit_to_celsius)
+    fahrenheit_action.triggered.connect(change_temp_unit_to_fahrenheit)
+    kelvin_action.triggered.connect(change_temp_unit_to_kelvin)
+
+    # Add actions to the temperature unit menu
+    temp_unit_menu.addAction(celsius_action)
+    temp_unit_menu.addAction(fahrenheit_action)
+    temp_unit_menu.addAction(kelvin_action)
+
+    # Add an exit action
     tray_menu.addAction(exit_action)
     tray_icon.setContextMenu(tray_menu)
     tray_icon.activated.connect(tray_icon_clicked)
