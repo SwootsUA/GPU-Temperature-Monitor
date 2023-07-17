@@ -27,6 +27,8 @@ To run the application, execute the following command in your terminal or comman
 2. Double-click on the system tray icon to show/hide the GPU temperature monitor window.
 3. The temperature label will be updated every second.
 4. The label color will change according to the temperature gradient, indicating different temperature ranges.
+5. You can toggle move and resize actions by selecting "Toggle Move/Resize" in the system tray menu.
+6. To change the temperature unit, right-click on the system tray icon and select "Temperature Unit," then choose Celsius, Fahrenheit, or Kelvin.
 
 ## Compiling to EXE
 
