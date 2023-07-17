@@ -8,6 +8,7 @@ This is a simple GPU temperature monitor application written in Python using PyQ
 - PyQt5 (`pip install PyQt5`)
 - NVIDIA Management Library (`pip install pynvml`)
 - NVIDIA GPU with installed drivers
+- Custom Configuration File (config.py)
 
 ## How to Use
 
@@ -15,11 +16,19 @@ This is a simple GPU temperature monitor application written in Python using PyQ
 2. Ensure that you have an NVIDIA GPU with installed drivers.
 3. Download the code provided in the `gpu_temp_app.py` file and save it on your computer.
 
+## Custom Configuration
+
+A custom configuration file named `config.py` is provided with the application. This file contains constants and configuration settings that can be adjusted by the user to customize the application's behavior. Before running the application, ensure that the `config.py` file is located in the same directory as `gpu_temp_app.py`.
+
+Feel free to adjust the values in the config.py file according to your preferences or GPU specifications.
+
 ## Execution
 
 To run the application, execute the following command in your terminal or command prompt:
 
 ```python gpu_temp_app.py```
+
+Please ensure that the `gpu_temp_app.py` script and the `config.py` file are located in the same directory. The application will use the constants defined in the `config.py` file for customization and GPU temperature calculations.
 
 ## Instructions
 
@@ -42,8 +51,11 @@ If you want to compile the Python script into an executable (EXE) file, you can 
 
 ```pyinstaller --onefile --noconsole --clean gpu_temp_app.py```
 
-
 3. After the compilation is complete, you will find the EXE file in the `dist` directory.
+
+Please note that when you compile the script to an EXE, the resulting executable will read the configuration settings from the config.py file during the build process. However, once compiled, the EXE file will remain unchanged and will use the configuration values stored in the config.py file that was present at the time of compilation.
+
+If you want to make changes to the application's behavior after compiling it into an EXE, you will need to modify the config.py file and then recompile the script to generate a new EXE with the updated settings.
 
 ## Note
 
