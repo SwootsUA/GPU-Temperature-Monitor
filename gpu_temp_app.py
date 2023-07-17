@@ -187,14 +187,18 @@ def handle_tray_icon_click(reason):
             clock.hide()
         is_clock_displayed = not is_clock_displayed
 
-def change_temp_unit_to_celsius():
-    clock.temp_unit = 'C'
-
-def change_temp_unit_to_fahrenheit():
-    clock.temp_unit = 'F'
-
-def change_temp_unit_to_kelvin():
-    clock.temp_unit = 'K'
+def change_temp_unit(unit):
+    clock.temp_unit = unit
+    unit_to_action = {
+        'C': celsius_action,
+        'F': fahrenheit_action,
+        'K': kelvin_action
+    }
+    for action in temp_unit_menu.actions():
+        if action == unit_to_action[unit]:
+            action.setChecked(True)
+        else:
+            action.setChecked(False)
 
 if __name__ == '__main__':
     is_clock_displayed = True
@@ -226,14 +230,14 @@ if __name__ == '__main__':
 
     # Add options to change temperature units in the tray menu
     temp_unit_menu = tray_menu.addMenu('Temperature Unit')
-    celsius_action = QAction('Celsius', qApp)
-    fahrenheit_action = QAction('Fahrenheit', qApp)
-    kelvin_action = QAction('Kelvin', qApp)
+    celsius_action = QAction('Celsius', qApp, checkable=True, checked=True)
+    fahrenheit_action = QAction('Fahrenheit', qApp, checkable=True)
+    kelvin_action = QAction('Kelvin', qApp, checkable=True)
 
     # Connect actions to their respective functions
-    celsius_action.triggered.connect(change_temp_unit_to_celsius)
-    fahrenheit_action.triggered.connect(change_temp_unit_to_fahrenheit)
-    kelvin_action.triggered.connect(change_temp_unit_to_kelvin)
+    celsius_action.triggered.connect(lambda: change_temp_unit('C'))
+    fahrenheit_action.triggered.connect(lambda: change_temp_unit('F'))
+    kelvin_action.triggered.connect(lambda: change_temp_unit('K'))
 
     # Add actions to the temperature unit menu
     temp_unit_menu.addAction(celsius_action)
