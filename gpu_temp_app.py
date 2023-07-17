@@ -19,6 +19,7 @@ class TransparentClock(QWidget):
         super().__init__()
         self.gpu_handle = None
         self.blink_flag = False
+        self.text_font = 'Courier New'
         self.temp_unit = 'C'  # Default temperature unit is Celsius
         self.initUI()
 
@@ -151,7 +152,7 @@ class TransparentClock(QWidget):
             color = self.interpolate_color(gradient_colors[gradient_points.index(lower_point)], gradient_colors[gradient_points.index(upper_point)], ratio)
 
             color_string = f'rgb({color[0]}, {color[1]}, {color[2]})'
-            self.temperature_label.setStyleSheet(f'QLabel {{ color: {color_string}; font-size: 24px; font: 24pt "Courier New", monospace, bold;}}')
+            self.temperature_label.setStyleSheet(f'QLabel {{ color: {color_string}; font-size: 24px; font: 24pt {self.text_font}, monospace, bold;}}')
             self.temperature_label.setText(f"GPU: {displayed_temperature}{degree_symbol}{self.temp_unit}")
             self.blink_flag = not self.blink_flag  # Toggle blinking
 
@@ -213,6 +214,19 @@ def change_temp_unit(unit):
         else:
             action.setChecked(False)
 
+def change_font(font):
+    clock.text_font = font
+    font_to_action = {
+        'Courier New': courier_action,
+        'Menlo': menlo_action,
+        'Consolas': consolas_action
+    }
+    for action in font_menu.actions():
+        if action == font_to_action[font]:
+            action.setChecked(True)
+        else:
+            action.setChecked(False)
+
 if __name__ == '__main__':
     is_clock_displayed = True
     app = QApplication(sys.argv)
@@ -240,6 +254,22 @@ if __name__ == '__main__':
     toggle_move_resize = QAction('Toggle Move/Resize', qApp)
     toggle_move_resize.triggered.connect(toggle_move_resize_action)
     tray_menu.addAction(toggle_move_resize)
+
+    # Add options to change font
+    font_menu = tray_menu.addMenu('Font')
+    courier_action = QAction('Courier', qApp, checkable=True, checked=True)
+    menlo_action = QAction('Menlo', qApp, checkable=True)
+    consolas_action = QAction('Consolas', qApp, checkable=True)
+
+    # Connect actions to their respective functions
+    courier_action.triggered.connect(lambda: change_font('Courier New'))
+    menlo_action.triggered.connect(lambda: change_font('Menlo'))
+    consolas_action.triggered.connect(lambda: change_font('Consolas'))
+
+    # Add actions to the font menu
+    font_menu.addAction(courier_action)
+    font_menu.addAction(menlo_action)
+    font_menu.addAction(consolas_action)
 
     # Add options to change temperature units in the tray menu
     temp_unit_menu = tray_menu.addMenu('Temperature Unit')
