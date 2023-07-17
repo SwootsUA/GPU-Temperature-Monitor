@@ -38,7 +38,7 @@ If you want to compile the Python script into an executable (EXE) file, you can 
 
 2. Compile the script into an EXE:
 
-```pyinstaller --onefile gpu_temp_app.py```
+```pyinstaller --onefile --noconsole --clean gpu_temp_app.py```
 
 
 3. After the compilation is complete, you will find the EXE file in the `dist` directory.

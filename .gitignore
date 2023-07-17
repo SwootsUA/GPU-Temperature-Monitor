@@ -1,5 +1,14 @@
-# Ignore all .exe files
+# Ignore .exe files
 *.exe
 
 # Ignore files containing the word "test" in their name
 *test*
+
+# Ignore .svg
+*.svg
+
+# Ignore files and directories generated from compiling
+/__pycache__
+/build
+/dist
+*.spec
