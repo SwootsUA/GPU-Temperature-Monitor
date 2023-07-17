@@ -106,10 +106,15 @@ class TransparentClock(QWidget):
                 # Resize the window based on the cursor position
                 if right_edge:
                     new_width = max(cursor_pos.x(), 200)  # Lower limit on window_width is 200px
+                    if new_width / window_height < 4:
+                        new_width = window_height * 4
                     self.resize(new_width, window_height)
                 if bottom_edge:
                     new_height = max(cursor_pos.y(), 50)  # Lower limit on window_height is 50px
-                    self.resize(window_width, new_height)
+                    new_width = window_width
+                    if window_width / new_height < 4:
+                        new_width = new_height * 4
+                    self.resize(new_width, new_height)
 
                 # Move the window if not close to the edges
                 if not (right_edge or bottom_edge):
@@ -152,7 +157,7 @@ class TransparentClock(QWidget):
             color = self.interpolate_color(gradient_colors[gradient_points.index(lower_point)], gradient_colors[gradient_points.index(upper_point)], ratio)
 
             color_string = f'rgb({color[0]}, {color[1]}, {color[2]})'
-            self.temperature_label.setStyleSheet(f'QLabel {{ color: {color_string}; font-size: 24px; font: 24pt {self.text_font}, monospace, bold;}}')
+            self.temperature_label.setStyleSheet(f'QLabel {{ color: {color_string}; font: {round(self.window_height * 0.64)}px {self.text_font}, monospace, bold;}}')
             self.temperature_label.setText(f"GPU: {displayed_temperature}{degree_symbol}{self.temp_unit}")
             self.blink_flag = not self.blink_flag  # Toggle blinking
 
