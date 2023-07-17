@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QDesktopWidget, QMenu
 from PyQt5.QtGui import QIcon, QPixmap, QColor, QPainter, QPen
 from PyQt5.QtCore import QTimer, Qt, QByteArray
 import winsound
-from config import GRADIENT_POINTS, GRADIENT_COLORS, HOTSPOT_OFFSET, TEMPERATURE_UPDATE_INTERVAL
+from config import GRADIENT_POINTS, GRADIENT_COLORS, HOTSPOT_OFFSET, TEMPERATURE_UPDATE_INTERVAL, WINDOW_RECT, POSITION
 
 gradient_points = GRADIENT_POINTS
 gradient_colors = GRADIENT_COLORS
@@ -23,8 +23,8 @@ class TransparentClock(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.window_width = 300
-        self.window_height = 50
+        self.window_width = WINDOW_RECT['width']
+        self.window_height = WINDOW_RECT['height']
         self.is_move_resize_enabled = False
         
         self.background_color = QColor(0, 0, 0, 200)
@@ -56,7 +56,7 @@ class TransparentClock(QWidget):
 
     def position_at_top_right_corner(self):
         screen_geo = QDesktopWidget().availableGeometry(self)
-        self.move((screen_geo.width() - self.window_width) - 20, (self.height() - 20))
+        self.move((screen_geo.width() - self.window_width) - POSITION['x'], (self.height() - POSITION['y']))
 
     def resizeEvent(self, event):
         self.window_width = self.width()
@@ -179,6 +179,15 @@ class TransparentClock(QWidget):
         # Clean up NVML before closing the application
         pynvml.nvmlShutdown()
 
+def restore_size():
+    # Restore the initial size of the window
+    clock.resize(WINDOW_RECT['width'], WINDOW_RECT['height'])
+
+def restore_position():
+    # Restore the position size of the window
+    screen_geo = QDesktopWidget().availableGeometry(clock)
+    clock.move((screen_geo.width() - clock.window_width) - POSITION['x'], (clock.height() - POSITION['y']))
+
 def toggle_move_resize_action():
     clock.is_move_resize_enabled = not clock.is_move_resize_enabled
 
@@ -247,6 +256,19 @@ if __name__ == '__main__':
     temp_unit_menu.addAction(celsius_action)
     temp_unit_menu.addAction(fahrenheit_action)
     temp_unit_menu.addAction(kelvin_action)
+
+    # Add the Restore sub-menu
+    restore_menu = tray_menu.addMenu('Restore')
+
+    # Add the Restore Size action and connect it to a function
+    restore_size_action = QAction('Restore Size', qApp)
+    restore_size_action.triggered.connect(restore_size)
+    restore_menu.addAction(restore_size_action)
+
+    # Add the Restore Position action and connect it to a function
+    restore_position_action = QAction('Restore Position', qApp)
+    restore_position_action.triggered.connect(restore_position)
+    restore_menu.addAction(restore_position_action)
 
     # Add an exit action
     tray_menu.addAction(exit_action)

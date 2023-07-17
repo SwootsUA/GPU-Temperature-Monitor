@@ -10,5 +10,15 @@ HOTSPOT_OFFSET = {
     'high': 20,
 }
 
+WINDOW_RECT = {
+    'width': 200,
+    'height': 50,
+}
+
+POSITION = {
+    'x': 20,
+    'y': 20,
+}
+
 # Update interval for the temperature label (in milliseconds)
 TEMPERATURE_UPDATE_INTERVAL = 1000
