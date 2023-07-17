@@ -35,9 +35,10 @@ Please ensure that the `gpu_temp_app.py` script and the `config.py` file are loc
 2. Double-click on the system tray icon to show/hide the GPU temperature monitor window.
 3. The temperature label will be updated every second.
 4. The label color will change according to the temperature gradient, indicating different temperature ranges.
-5. You can toggle move and resize actions by selecting "Toggle Move/Resize" in the system tray menu.
-6. Size and position can be restored by selecting "Restore Size" and "Restore Position" in the "Restore" menu.
-7. To change the temperature unit, right-click on the system tray icon and select "Temperature Unit," then choose Celsius, Fahrenheit, or Kelvin.
+5. Font can be changed to one of the three font options by right-clicking on the system tray icon and choosing "Font" then pick from the available fonts.
+6. You can toggle move and resize actions by selecting "Toggle Move/Resize" in the system tray menu.
+7. Size and position can be restored by selecting "Restore Size" and "Restore Position" in the "Restore" menu.
+8. To change the temperature unit, right-click on the system tray icon and select "Temperature Unit," then choose Celsius, Fahrenheit, or Kelvin.
 
 ## Compiling to EXE
 
