@@ -9,7 +9,7 @@ WARNING_TEMPERATURE = 95
 
 # Hotspot offset for GPU temperature calculation
 HOTSPOT_OFFSET = {
-    'low': 15,
+    'low': 10,
     'high': 20,
 }
 
