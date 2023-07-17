@@ -8,7 +8,6 @@ This is a simple GPU temperature monitor application written in Python using PyQ
 - PyQt5 (`pip install PyQt5`)
 - NVIDIA Management Library (`pip install pynvml`)
 - NVIDIA GPU with installed drivers
-- Custom Configuration File (config.py)
 
 ## How to Use
 
