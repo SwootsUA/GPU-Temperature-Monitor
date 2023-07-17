@@ -81,13 +81,15 @@ class TransparentClock(QWidget):
     def mouseMoveEvent(self, event):
         if self.is_move_resize_enabled:
             # Check if the mouse is close to the edges of the window
-            # within a certain range (e.g., 10 pixels)
-            edge_distance = 10
+            # within a certain range (e.g., 20 pixels)
+            edge_distance = 20
             cursor_pos = event.pos()
             window_rect = self.rect()
+            window_width = window_rect.width()
+            window_height = window_rect.height()
 
-            right_edge = cursor_pos.x() >= window_rect.width() - edge_distance
-            bottom_edge = cursor_pos.y() >= window_rect.height() - edge_distance
+            right_edge = cursor_pos.x() >= window_width - edge_distance
+            bottom_edge = cursor_pos.y() >= window_height - edge_distance
 
             # Set the cursor shape for resizing based on the edge position
             if right_edge and bottom_edge:
@@ -102,14 +104,16 @@ class TransparentClock(QWidget):
             if event.buttons() == Qt.LeftButton:
                 # Resize the window based on the cursor position
                 if right_edge:
-                    self.resize(cursor_pos.x(), window_rect.height())
+                    new_width = max(cursor_pos.x(), 200)  # Lower limit on window_width is 200px
+                    self.resize(new_width, window_height)
                 if bottom_edge:
-                    self.resize(window_rect.width(), cursor_pos.y())
+                    new_height = max(cursor_pos.y(), 50)  # Lower limit on window_height is 50px
+                    self.resize(window_width, new_height)
 
-            # Move the window if not close to the edges
-            if not (right_edge or bottom_edge):
-                self.setCursor(Qt.SizeAllCursor)
-                self.move(event.globalPos() - self.drag_position)
+                # Move the window if not close to the edges
+                if not (right_edge or bottom_edge):
+                    self.setCursor(Qt.SizeAllCursor)
+                    self.move(event.globalPos() - self.drag_position)
 
             event.accept()
 
