@@ -6,11 +6,11 @@
 import sys
 import pynvml
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QDesktopWidget, QMenu, QAction, qApp, QSystemTrayIcon
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QPixmap, QColor, QPainter, QPen
 from PyQt5.QtCore import QTimer, Qt, QByteArray
 import winsound
 
-displayed_flag = False
+is_clock_displayed = False
 
 class TransparentClock(QWidget):
     def __init__(self):
@@ -21,8 +21,14 @@ class TransparentClock(QWidget):
         self.initUI()
 
     def initUI(self):
+        self.window_width = 300
+        self.window_height = 50
+        self.is_move_resize_enabled = False
+        
+        self.background_color = QColor(0, 0, 0, 200)
+
         self.setWindowTitle('GPU Temperature')
-        self.setGeometry(0, 0, 300, 50)
+        self.setGeometry(0, 0, self.window_width, self.window_height)
 
         # Set window flags to enable transparency and disable window frame
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
@@ -31,6 +37,7 @@ class TransparentClock(QWidget):
         self.temperature_label = QLabel(self)
         self.temperature_label.setAlignment(Qt.AlignCenter)
         self.temperature_label.setStyleSheet("QLabel { font: 24pt 'Courier New', monospace; }")  # Set the font using CSS
+        self.temperature_label.setAttribute(Qt.WA_TransparentForMouseEvents)  # Allow resizing through the widget
 
         # Initialize NVML to get GPU temperature
         pynvml.nvmlInit()
@@ -39,20 +46,75 @@ class TransparentClock(QWidget):
             self.gpu_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
 
         # Update the temperature label every second (1000ms)
-        timer = QTimer(self)
-        timer.timeout.connect(self.update_temperature)
-        timer.start(1000)
+        temperature_update_timer = QTimer(self)
+        temperature_update_timer.timeout.connect(self.update_temperature)
+        temperature_update_timer.start(1000)
 
-        self.center_on_screen()
+        self.position_at_top_right_corner()
 
-    def center_on_screen(self):
-        # Get the center of the screen
+    def position_at_top_right_corner(self):
         screen_geo = QDesktopWidget().availableGeometry(self)
-        self.move((screen_geo.width() - self.width()) - 20, (self.height() - 20))
+        self.move((screen_geo.width() - self.window_width) - 20, (self.height() - 20))
 
     def resizeEvent(self, event):
-        # Adjust the label size to the window size
+        self.window_width = self.width()
+        self.window_height = self.height()
         self.temperature_label.setGeometry(self.rect())
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        # Set semi-transparent background when move/resize is enabled
+        if self.is_move_resize_enabled:
+            painter.fillRect(self.rect(), self.background_color)
+            painter.setPen(QPen(Qt.white, 1, Qt.SolidLine))
+            painter.drawRect(self.rect())
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton and self.is_move_resize_enabled:
+            self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
+            event.accept()
+
+    def mouseMoveEvent(self, event):
+        if self.is_move_resize_enabled:
+            # Check if the mouse is close to the edges of the window
+            # within a certain range (e.g., 10 pixels)
+            edge_distance = 10
+            cursor_pos = event.pos()
+            window_rect = self.rect()
+
+            right_edge = cursor_pos.x() >= window_rect.width() - edge_distance
+            bottom_edge = cursor_pos.y() >= window_rect.height() - edge_distance
+
+            # Set the cursor shape for resizing based on the edge position
+            if right_edge and bottom_edge:
+                self.setCursor(Qt.SizeFDiagCursor)
+            elif right_edge:
+                self.setCursor(Qt.SizeHorCursor)
+            elif bottom_edge:
+                self.setCursor(Qt.SizeVerCursor)
+            else:
+                self.setCursor(Qt.ArrowCursor)
+
+            if event.buttons() == Qt.LeftButton:
+                # Resize the window based on the cursor position
+                if right_edge:
+                    self.resize(cursor_pos.x(), window_rect.height())
+                if bottom_edge:
+                    self.resize(window_rect.width(), cursor_pos.y())
+
+            # Move the window if not close to the edges
+            if not (right_edge or bottom_edge):
+                self.setCursor(Qt.SizeAllCursor)
+                self.move(event.globalPos() - self.drag_position)
+
+            event.accept()
+
+    def mouseDoubleClickEvent(self, event):
+        if self.is_move_resize_enabled:
+            self.setWindowState(self.windowState() ^ Qt.WindowMaximized)
+            event.accept()
 
     def update_temperature(self):
         if self.gpu_handle:
@@ -65,15 +127,13 @@ class TransparentClock(QWidget):
             else:
                 displayed_temperature = temperature
 
-
             if self.blink_flag:
-                degree_symbol = "°"  
+                degree_symbol = "°"
             else:
-                if temperature > 90:  
-                    winsound.Beep(750, 100) # Frequency: 750Hz, Duration: 100ms
-                degree_symbol =" "
+                if temperature > 90:
+                    winsound.Beep(750, 100)  # Frequency: 750Hz, Duration: 100ms
+                degree_symbol = " "
 
-            # change color based on temperature
             gradient_points = [50, 60, 70, 80, 90, 100]
             gradient_colors = [(0, 255, 0), (255, 255, 0), (255, 165, 0), (255, 69, 0), (128, 0, 0)]
 
@@ -116,14 +176,17 @@ class TransparentClock(QWidget):
         # Clean up NVML before closing the application
         pynvml.nvmlShutdown()
 
-def tray_icon_clicked(reason):
+def toggle_move_resize_action():
+    clock.is_move_resize_enabled = not clock.is_move_resize_enabled
+
+def handle_tray_icon_click(reason):
+    global is_clock_displayed
     if reason == QSystemTrayIcon.DoubleClick:
-        global displayed_flag
-        if not displayed_flag:
+        if not is_clock_displayed:
             clock.show()
         else:
             clock.hide()
-        displayed_flag = not displayed_flag
+        is_clock_displayed = not is_clock_displayed
 
 def change_temp_unit_to_celsius():
     clock.temp_unit = 'C'
@@ -135,7 +198,7 @@ def change_temp_unit_to_kelvin():
     clock.temp_unit = 'K'
 
 if __name__ == '__main__':
-    displayed_flag = True
+    is_clock_displayed = True
     app = QApplication(sys.argv)
 
     # Custom icon - binary
@@ -157,6 +220,11 @@ if __name__ == '__main__':
     exit_action.triggered.connect(app.quit)
     tray_menu = QMenu()
 
+    # Add option to toggle move and resize
+    toggle_move_resize = QAction('Toggle Move/Resize', qApp)
+    toggle_move_resize.triggered.connect(toggle_move_resize_action)
+    tray_menu.addAction(toggle_move_resize)
+
     # Add options to change temperature units in the tray menu
     temp_unit_menu = tray_menu.addMenu('Temperature Unit')
     celsius_action = QAction('Celsius', qApp)
@@ -176,7 +244,7 @@ if __name__ == '__main__':
     # Add an exit action
     tray_menu.addAction(exit_action)
     tray_icon.setContextMenu(tray_menu)
-    tray_icon.activated.connect(tray_icon_clicked)
+    tray_icon.activated.connect(handle_tray_icon_click)
 
     clock = TransparentClock()
 
