@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QDesktopWidget, QMenu
 from PyQt5.QtGui import QIcon, QPixmap, QColor, QPainter, QPen
 from PyQt5.QtCore import QTimer, Qt, QByteArray
 import winsound
+import configparser
 from config import GRADIENT_POINTS, GRADIENT_COLORS, HOTSPOT_OFFSET, TEMPERATURE_UPDATE_INTERVAL, WINDOW_RECT, POSITION, WARNING_TEMPERATURE
 
 gradient_points = GRADIENT_POINTS
@@ -181,9 +182,25 @@ class TransparentClock(QWidget):
         b = round(b1 + (b2 - b1) * ratio)
         return r, g, b
 
-    def closeEvent(self, event):
+    def save_settings(self):
+        config = configparser.ConfigParser()
+        config['SETTINGS'] = {
+            'width': str(clock.window_width),
+            'height': str(clock.window_height),
+            'x_pos': str(clock.pos().x()),
+            'y_pos': str(clock.pos().y()),
+            'font': clock.text_font,
+            'temp_unit': clock.temp_unit,
+        }
+
+        with open('config.ini', 'w') as configfile:
+            config.write(configfile)
+
+    def closeEvent(self):
         # Clean up NVML before closing the application
+        self.save_settings()
         pynvml.nvmlShutdown()
+        app.quit()
 
 def restore_size():
     # Restore the initial size of the window
@@ -232,6 +249,18 @@ def change_font(font):
         else:
             action.setChecked(False)
 
+def load_settings():
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+
+    if 'SETTINGS' in config:
+        clock.resize(int(config['SETTINGS'].get('width', clock.window_width)), int(config['SETTINGS'].get('height', clock.window_height)))
+        x_pos = int(config['SETTINGS'].get('x_pos', 0))
+        y_pos = int(config['SETTINGS'].get('y_pos', 0))
+        clock.move(x_pos, y_pos)
+        clock.text_font = config['SETTINGS'].get('font', clock.text_font)
+        clock.temp_unit = config['SETTINGS'].get('temp_unit', clock.temp_unit)
+
 if __name__ == '__main__':
     is_clock_displayed = True
     app = QApplication(sys.argv)
@@ -252,7 +281,7 @@ if __name__ == '__main__':
     tray_icon = QSystemTrayIcon(icon)
     tray_icon.setToolTip('GPU Temperature Monitor')
     exit_action = QAction('Exit', qApp)
-    exit_action.triggered.connect(app.quit)
+    exit_action.triggered.connect(lambda: clock.closeEvent())
     tray_menu = QMenu()
 
     # Add option to toggle move and resize
@@ -311,6 +340,7 @@ if __name__ == '__main__':
     tray_icon.activated.connect(handle_tray_icon_click)
 
     clock = TransparentClock()
+    load_settings() # Load settings from the configuration file
 
     # Show the application in the system tray initially
     tray_icon.show()

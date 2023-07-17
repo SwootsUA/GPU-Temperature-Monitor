@@ -4,6 +4,9 @@
 # Ignore files containing the word "test" in their name
 *test*
 
+# Ignore configuration file
+*.ini
+
 # Ignore .svg
 *.svg
 
