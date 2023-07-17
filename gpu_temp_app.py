@@ -211,17 +211,23 @@ def restore_position():
     screen_geo = QDesktopWidget().availableGeometry(clock)
     clock.move((screen_geo.width() - clock.window_width) - POSITION['x'], (clock.height() - POSITION['y']))
 
-def toggle_move_resize_action():
+def toggle_move_resize():
     clock.is_move_resize_enabled = not clock.is_move_resize_enabled
+    toggle_move_resize_action.setChecked(True) if clock.is_move_resize_enabled else toggle_move_resize_action.setChecked(False)
+
+def toggle_visibility():
+    global is_clock_displayed
+    if not is_clock_displayed:
+        clock.show()
+        toggle_visibility_action.setChecked(True)
+    else:
+        clock.hide()
+        toggle_visibility_action.setChecked(False)
+    is_clock_displayed = not is_clock_displayed
 
 def handle_tray_icon_click(reason):
-    global is_clock_displayed
     if reason == QSystemTrayIcon.DoubleClick:
-        if not is_clock_displayed:
-            clock.show()
-        else:
-            clock.hide()
-        is_clock_displayed = not is_clock_displayed
+        toggle_visibility()
 
 def change_temp_unit(unit):
     clock.temp_unit = unit
@@ -284,10 +290,14 @@ if __name__ == '__main__':
     exit_action.triggered.connect(lambda: clock.closeEvent())
     tray_menu = QMenu()
 
+    toggle_visibility_action = QAction('Show temperature', qApp, checkable=True, checked=True)
+    toggle_visibility_action.triggered.connect(toggle_visibility)
+    tray_menu.addAction(toggle_visibility_action)
+
     # Add option to toggle move and resize
-    toggle_move_resize = QAction('Toggle Move/Resize', qApp)
-    toggle_move_resize.triggered.connect(toggle_move_resize_action)
-    tray_menu.addAction(toggle_move_resize)
+    toggle_move_resize_action = QAction('Toggle Move/Resize', qApp, checkable=True, checked=False)
+    toggle_move_resize_action.triggered.connect(toggle_move_resize)
+    tray_menu.addAction(toggle_move_resize_action)
 
     # Add options to change font
     font_menu = tray_menu.addMenu('Font')
