@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QDesktopWidget, QMenu
 from PyQt5.QtGui import QIcon, QPixmap, QColor, QPainter, QPen
 from PyQt5.QtCore import QTimer, Qt, QByteArray
 import winsound
-from config import GRADIENT_POINTS, GRADIENT_COLORS, HOTSPOT_OFFSET, TEMPERATURE_UPDATE_INTERVAL, WINDOW_RECT, POSITION
+from config import GRADIENT_POINTS, GRADIENT_COLORS, HOTSPOT_OFFSET, TEMPERATURE_UPDATE_INTERVAL, WINDOW_RECT, POSITION, WARNING_TEMPERATURE
 
 gradient_points = GRADIENT_POINTS
 gradient_colors = GRADIENT_COLORS
@@ -142,7 +142,7 @@ class TransparentClock(QWidget):
             if self.blink_flag:
                 degree_symbol = "°"
             else:
-                if temperature > 90:
+                if temperature >= WARNING_TEMPERATURE:
                     winsound.Beep(750, 100)  # Frequency: 750Hz, Duration: 100ms
                 degree_symbol = " "
 

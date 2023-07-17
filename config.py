@@ -2,7 +2,10 @@
 
 # Gradient points and corresponding colors
 GRADIENT_POINTS = [50, 60, 70, 80, 90, 100]
-GRADIENT_COLORS = [(0, 255, 0), (255, 255, 0), (255, 165, 0), (255, 69, 0), (128, 0, 0)]
+GRADIENT_COLORS = [(0, 255, 0), (255, 255, 0), (255, 165, 0), (255, 69, 0), (150, 0, 0), (120, 0, 0)]
+
+# Notification Threshold Temperature in Celsius 
+WARNING_TEMPERATURE = 95
 
 # Hotspot offset for GPU temperature calculation
 HOTSPOT_OFFSET = {
