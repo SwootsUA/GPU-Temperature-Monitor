@@ -258,8 +258,8 @@ def load_settings():
         x_pos = int(config['SETTINGS'].get('x_pos', 0))
         y_pos = int(config['SETTINGS'].get('y_pos', 0))
         clock.move(x_pos, y_pos)
-        clock.text_font = config['SETTINGS'].get('font', clock.text_font)
-        clock.temp_unit = config['SETTINGS'].get('temp_unit', clock.temp_unit)
+        change_font(config['SETTINGS'].get('font', clock.text_font))
+        change_temp_unit(config['SETTINGS'].get('temp_unit', clock.temp_unit)) 
 
 if __name__ == '__main__':
     is_clock_displayed = True
