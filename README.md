@@ -19,7 +19,7 @@ This is a simple GPU temperature monitor application written in Python using PyQ
 
 A custom configuration file named `config.py` is provided with the application. This file contains constants and configuration settings that can be adjusted by the user to customize the application's behavior. Before running the application, ensure that the `config.py` file is located in the same directory as `gpu_temp_app.py`.
 
-Feel free to adjust the values in the config.py file according to your preferences or GPU specifications.
+Feel free to adjust the values in the `config.py` file based on your preferences or GPU specifications.
 
 ## Execution
 
@@ -36,7 +36,8 @@ Please ensure that the `gpu_temp_app.py` script and the `config.py` file are loc
 3. The temperature label will be updated every second.
 4. The label color will change according to the temperature gradient, indicating different temperature ranges.
 5. You can toggle move and resize actions by selecting "Toggle Move/Resize" in the system tray menu.
-6. To change the temperature unit, right-click on the system tray icon and select "Temperature Unit," then choose Celsius, Fahrenheit, or Kelvin.
+6. Size and position can be restored by selecting "Restore Size" and "Restore Position" in the "Restore" menu.
+7. To change the temperature unit, right-click on the system tray icon and select "Temperature Unit," then choose Celsius, Fahrenheit, or Kelvin.
 
 ## Compiling to EXE
 
@@ -52,9 +53,9 @@ If you want to compile the Python script into an executable (EXE) file, you can 
 
 3. After the compilation is complete, you will find the EXE file in the `dist` directory.
 
-Please note that when you compile the script to an EXE, the resulting executable will read the configuration settings from the config.py file during the build process. However, once compiled, the EXE file will remain unchanged and will use the configuration values stored in the config.py file that was present at the time of compilation.
+Please note that when you compile the script to an EXE, the resulting executable will read the configuration settings from the `config.py` file during the build process. However, once compiled, the EXE file will remain unchanged and will use the configuration values stored in the `config.py` file that was present at the time of compilation.
 
-If you want to make changes to the application's behavior after compiling it into an EXE, you will need to modify the config.py file and then recompile the script to generate a new EXE with the updated settings.
+If you want to make changes to the application's behavior after compiling it into an EXE, you will need to modify the `config.py` file and then recompile the script to generate a new EXE with the updated settings.
 
 ## Note
 
