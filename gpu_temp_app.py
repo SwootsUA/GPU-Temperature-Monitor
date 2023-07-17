@@ -6,8 +6,8 @@
 import sys
 import pynvml
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QDesktopWidget, QMenu, QAction, qApp, QSystemTrayIcon
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import QTimer, Qt, QByteArray
 import winsound
 
 displayed_flag = False
@@ -120,10 +120,17 @@ if __name__ == '__main__':
     displayed_flag = True
     app = QApplication(sys.argv)
 
-    # Load the custom icon from resources
-    icon = QIcon('temperature.ico')
-    if icon.isNull():
-        icon = QIcon.fromTheme('computer')  # Fallback to the default system icon if the custom icon is not found
+    # Custom icon - binary
+    icon_data = b'<?xml version="1.0" standalone="no"?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"\n "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">\n<svg version="1.0" xmlns="http://www.w3.org/2000/svg"\n width="256.000000pt" height="256.000000pt" viewBox="0 0 256.000000 256.000000"\n preserveAspectRatio="xMidYMid meet">\n\n<g transform="translate(0.000000,256.000000) scale(0.100000,-0.100000)"\nfill="#000000" stroke="none">\n<path d="M830 2544 c-189 -50 -337 -195 -385 -379 -13 -50 -15 -148 -15 -609\nl0 -550 -39 -81 c-125 -255 -80 -536 119 -735 76 -75 148 -121 252 -158 64\n-23 88 -26 198 -26 110 0 134 3 198 26 104 37 176 83 252 158 199 199 244 473\n120 730 l-40 81 0 553 c0 608 0 612 -63 730 -109 206 -371 320 -597 260z m277\n-235 c67 -32 109 -75 145 -149 23 -45 23 -45 26 -630 l2 -585 45 -90 c56 -110\n72 -189 56 -277 -33 -188 -171 -326 -359 -359 -172 -31 -367 73 -443 235 -65\n139 -61 249 16 401 l45 90 0 566 c0 632 -1 623 69 714 90 119 254 153 398 84z"/>\n<path d="M899 1475 c-45 -24 -49 -57 -49 -365 l0 -287 -30 -26 c-51 -45 -73\n-101 -68 -172 4 -73 31 -120 92 -163 35 -24 49 -27 116 -27 65 0 82 4 113 25\n118 80 131 244 27 337 l-30 26 0 290 c0 314 -4 342 -56 366 -34 15 -83 13\n-115 -4z"/>\n<path d="M1765 2336 c-75 -33 -74 -155 2 -191 29 -14 65 -16 224 -13 l191 3\n29 33 c40 45 40 99 0 144 l-29 33 -194 3 c-145 1 -200 -1 -223 -12z"/>\n<path d="M1764 1910 c-34 -13 -54 -50 -54 -98 0 -35 6 -49 29 -73 28 -28 33\n-29 120 -29 105 0 134 10 156 56 22 46 11 97 -27 129 -27 23 -38 25 -116 24\n-48 0 -97 -4 -108 -9z"/>\n<path d="M1739 1461 c-39 -39 -41 -106 -5 -148 l24 -28 198 -3 c137 -2 206 0\n226 9 63 26 77 130 23 176 -25 22 -33 23 -231 23 l-206 0 -29 -29z"/>\n<path d="M1765 1056 c-74 -32 -74 -155 0 -191 46 -21 160 -20 205 3 76 38 74\n155 -4 187 -44 18 -160 19 -201 1z"/>\n</g>\n</svg>\n'
+    
+    # Convert the icon_data bytes to a QByteArray
+    icon_data = QByteArray(icon_data)
+
+    # Load the QPixmap from the QByteArray
+    pixmap = QPixmap()
+    pixmap.loadFromData(icon_data)
+
+    icon = QIcon(pixmap)
 
     # Create the system tray icon and add an exit action
     tray_icon = QSystemTrayIcon(icon)
