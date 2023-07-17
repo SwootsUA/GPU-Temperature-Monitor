@@ -9,8 +9,10 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QDesktopWidget, QMenu
 from PyQt5.QtGui import QIcon, QPixmap, QColor, QPainter, QPen
 from PyQt5.QtCore import QTimer, Qt, QByteArray
 import winsound
+from config import GRADIENT_POINTS, GRADIENT_COLORS, HOTSPOT_OFFSET, TEMPERATURE_UPDATE_INTERVAL
 
-is_clock_displayed = False
+gradient_points = GRADIENT_POINTS
+gradient_colors = GRADIENT_COLORS
 
 class TransparentClock(QWidget):
     def __init__(self):
@@ -45,10 +47,10 @@ class TransparentClock(QWidget):
         if device_count > 0:
             self.gpu_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
 
-        # Update the temperature label every second (1000ms)
+        # Update the temperature label every second (1000ms) by default
         temperature_update_timer = QTimer(self)
         temperature_update_timer.timeout.connect(self.update_temperature)
-        temperature_update_timer.start(1000)
+        temperature_update_timer.start(TEMPERATURE_UPDATE_INTERVAL)
 
         self.position_at_top_right_corner()
 
@@ -134,9 +136,6 @@ class TransparentClock(QWidget):
                     winsound.Beep(750, 100)  # Frequency: 750Hz, Duration: 100ms
                 degree_symbol = " "
 
-            gradient_points = [50, 60, 70, 80, 90, 100]
-            gradient_colors = [(0, 255, 0), (255, 255, 0), (255, 165, 0), (255, 69, 0), (128, 0, 0)]
-
             lower_point = max([point for point in gradient_points if point <= temperature])
             upper_point = min([point for point in gradient_points if point >= temperature])
 
@@ -156,11 +155,11 @@ class TransparentClock(QWidget):
         temperature = pynvml.nvmlDeviceGetTemperature(self.gpu_handle, pynvml.NVML_TEMPERATURE_GPU)
         # HotSpot offset (Example value, please refer to your GPU specifications)
         if temperature <= 45:
-            hotspot_offset = 15
+            hotspot_offset = HOTSPOT_OFFSET['low']
         elif temperature >= 65:
-            hotspot_offset = 20
+            hotspot_offset = HOTSPOT_OFFSET['high']
         else:
-            hotspot_offset = round(15 + (temperature - 45) * (20 - 15) / (65 - 45))
+            hotspot_offset = round(HOTSPOT_OFFSET['low'] + (temperature - 45) * (HOTSPOT_OFFSET['high'] - HOTSPOT_OFFSET['low']) / (65 - 45))
 
         return temperature + hotspot_offset
 
