@@ -28,6 +28,7 @@ class TransparentClock(QWidget):
         self.window_width = WINDOW_RECT['width']
         self.window_height = WINDOW_RECT['height']
         self.is_move_resize_enabled = False
+        self.is_warning_enabled = False
         
         self.background_color = QColor(0, 0, 0, 200)
 
@@ -143,7 +144,7 @@ class TransparentClock(QWidget):
             if self.blink_flag:
                 degree_symbol = "°"
             else:
-                if temperature >= WARNING_TEMPERATURE:
+                if temperature >= WARNING_TEMPERATURE and self.is_warning_enabled:
                     winsound.Beep(750, 100)  # Frequency: 750Hz, Duration: 100ms
                 degree_symbol = " "
 
@@ -225,6 +226,10 @@ def toggle_visibility():
         toggle_visibility_action.setChecked(False)
     is_clock_displayed = not is_clock_displayed
 
+def toggle_temperature_warning():
+    clock.is_warning_enabled = not clock.is_warning_enabled
+    toggle_temperature_warning_action.setCheckable(True) if clock.is_warning_enabled else toggle_temperature_warning_action.setCheckable(False)
+
 def handle_tray_icon_click(reason):
     if reason == QSystemTrayIcon.DoubleClick:
         toggle_visibility()
@@ -290,6 +295,7 @@ if __name__ == '__main__':
     exit_action.triggered.connect(lambda: clock.closeEvent())
     tray_menu = QMenu()
 
+    # Add option to toggle visibility of temperature
     toggle_visibility_action = QAction('Show temperature', qApp, checkable=True, checked=True)
     toggle_visibility_action.triggered.connect(toggle_visibility)
     tray_menu.addAction(toggle_visibility_action)
@@ -298,6 +304,11 @@ if __name__ == '__main__':
     toggle_move_resize_action = QAction('Toggle Move/Resize', qApp, checkable=True, checked=False)
     toggle_move_resize_action.triggered.connect(toggle_move_resize)
     tray_menu.addAction(toggle_move_resize_action)
+
+    # Add option to toggle temperature warning
+    toggle_temperature_warning_action = QAction('Toggle temperature warning', qApp, checkable=True, checked=False)
+    toggle_temperature_warning_action.triggered.connect(toggle_temperature_warning)
+    tray_menu.addAction(toggle_temperature_warning_action)
 
     # Add options to change font
     font_menu = tray_menu.addMenu('Font')
