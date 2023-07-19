@@ -68,14 +68,4 @@ This application is licensed under the MIT License. Feel free to use, modify, an
 
 ---
 
-This README provides an overview of the GPU Temperature Monitor application and how to use it, including instructions for compiling the Python script into an executable (EXE) file. If you encounter any issues or have questions, feel free to reach out or refer to the provided code for further details. Happy monitoring!
-
----
-
-<p align="center">
-    <a href="https://github.com/SwootsUA/GPU-Temperature-Monitor">View on GitHub</a>
-    &nbsp;·&nbsp;
-    <a href="https://github.com/SwootsUA/GPU-Temperature-Monitor/issues">Report Bug</a>
-    &nbsp;·&nbsp;
-    <a href="https://github.com/SwootsUA/GPU-Temperature-Monitor/pulls">Request Feature</a>
-</p>
+This README provides an overview of the GPU Temperature Monitor application and how to use it, including instructions for compiling the Python script into an executable (EXE) file. If you encounter any issues or have questions, feel free to reach out or refer to the provided code for further details.
