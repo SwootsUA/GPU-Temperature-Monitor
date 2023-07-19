@@ -7,6 +7,10 @@
 # Ignore configuration file
 *.ini
 
+# Ignore crash log folder
+/crash logs
+*.log
+
 # Ignore .svg
 *.svg
 

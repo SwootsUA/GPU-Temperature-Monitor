@@ -4,7 +4,10 @@
 # Created by Swoots
 
 import sys
+import os
+import logging
 import pynvml
+from datetime import datetime
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QDesktopWidget, QMenu, QAction, qApp, QSystemTrayIcon
 from PyQt5.QtGui import QIcon, QPixmap, QColor, QPainter, QPen
 from PyQt5.QtCore import QTimer, Qt, QByteArray
@@ -14,6 +17,20 @@ from config import GRADIENT_POINTS, GRADIENT_COLORS, HOTSPOT_OFFSET, TEMPERATURE
 
 gradient_points = GRADIENT_POINTS
 gradient_colors = GRADIENT_COLORS
+
+def setup_logging():
+    log_level = logging.ERROR
+
+    def exception_hook(exctype, value, tb):
+        if not os.path.exists("crash logs"):
+            os.makedirs("crash logs") 
+        log_file = "./crash logs/crash " + datetime.now().strftime("%d-%m-%Y %H-%M-%S") + ".log"
+        logging.basicConfig(filename=log_file, level=log_level, format="%(asctime)s - %(levelname)s: %(message)s")
+
+        logging.error("Uncaught exception occurred:", exc_info=(exctype, value, tb))
+        sys.exit(1)
+
+    sys.excepthook = exception_hook
 
 class TransparentClock(QWidget):
     def __init__(self):
@@ -165,6 +182,7 @@ class TransparentClock(QWidget):
 
     def get_gpu_temperature(self):
         temperature = pynvml.nvmlDeviceGetTemperature(self.gpu_handle, pynvml.NVML_TEMPERATURE_GPU)
+
         # HotSpot offset (Example value, please refer to your GPU specifications)
         if temperature <= 45:
             hotspot_offset = HOTSPOT_OFFSET['low']
@@ -273,6 +291,9 @@ def load_settings():
         change_temp_unit(config['SETTINGS'].get('temp_unit', clock.temp_unit)) 
 
 if __name__ == '__main__':
+    # Set up crash logging
+    setup_logging()
+
     is_clock_displayed = True
     app = QApplication(sys.argv)
 
